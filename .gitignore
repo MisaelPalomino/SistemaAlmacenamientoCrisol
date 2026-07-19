@@ -1,0 +1,179 @@
+# 📁 .gitignore
+
+# ============================================
+# PYTHON
+# ============================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+pythonenv*
+
+# ============================================
+# DJANGO
+# ============================================
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+/staticfiles/
+/media/
+*.sqlite3
+*.db
+
+# ============================================
+# IDE / EDITORES
+# ============================================
+# VS Code
+.vscode/
+*.code-workspace
+
+# PyCharm
+.idea/
+*.iml
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+*.un~
+
+# ============================================
+# SISTEMAS OPERATIVOS
+# ============================================
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Mac
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Linux
+.directory
+*.pid
+*.pid.lock
+
+# ============================================
+# ENTORNO Y VARIABLES
+# ============================================
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+*.crt
+
+# ============================================
+# TESTING Y COBERTURA
+# ============================================
+.coverage
+htmlcov/
+.pytest_cache/
+.tox/
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+*.pytest_cache
+
+# ============================================
+# DEPENDENCIAS Y PAQUETES
+# ============================================
+*.egg-info/
+*.egg
+dist/
+build/
+develop-eggs/
+downloads/
+eggs/
+parts/
+bin/
+var/
+sdist/
+*.whl
+*.egg-info/
+
+# ============================================
+# ARCHIVOS DE LOGS Y TEMPORALES
+# ============================================
+*.log
+*.tmp
+*.temp
+*.pid
+*.seed
+*.pid.lock
+
+# ============================================
+# DOCUMENTACIÓN
+# ============================================
+/docs/_build/
+/site/
+/_site/
+
+# ============================================
+# MIGRACIONES (OPCIONAL - DESCOMENTAR SI QUIERES EXCLUIRLAS)
+# ============================================
+# */migrations/
+# !*/migrations/__init__.py
+
+# ============================================
+# POSTMAN
+# ============================================
+# Exportar colecciones de Postman al repositorio
+# Pero excluir archivos temporales
+pruebas_api/reportes/
+*.postman_dump.json
+*.postman_backup.json
+
+# ============================================
+# OTROS
+# ============================================
+*.bak
+*.backup
+*.orig
+*.rej
+*.patch
+.DS_Store
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ============================================
+# ARCHIVOS DE BASE DE DATOS (SEGURIDAD)
+# ============================================
+*.sql
+*.dump
+*.backup
+
+# ============================================
+# ARCHIVOS DE PROYECTO
+# ============================================
+# Excluir archivos de configuración local
+config.local.py
+settings_local.py
+
+# ============================================
+# RENDER / DEPLOY
+# ============================================
+build/
+*.pyc
+__pycache__/
+*.pyo
+*.pyd
+.Python
