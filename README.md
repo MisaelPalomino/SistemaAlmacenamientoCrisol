@@ -16,7 +16,7 @@ Proyecto Django con arquitectura en capas (DDD) para la gestión de inventario.
 ### Productos (Integrante 1)
 CRUD completo + alertas de stock, valor de inventario, filtros.
 
-### Recepciones (Integrante 2) ← Tú estás aquí
+### Recepciones (Integrante 2) 
 
 Registro y control de recepciones de productos.
 
