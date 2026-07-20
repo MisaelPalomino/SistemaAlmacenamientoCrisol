@@ -13,7 +13,7 @@ Proyecto Django con arquitectura en capas (DDD) para la gestión de inventario d
 
 ## Servicios
 
-### Servicio de Productos — Integrante 1
+### Servicio de Productos — Misael Palomino
 
 CRUD completo de productos con alertas de stock, valor de inventario y filtros.
 
@@ -46,7 +46,7 @@ CRUD completo de productos con alertas de stock, valor de inventario y filtros.
 
 ---
 
-### Servicio de Recepciones — Integrante 2
+### Servicio de Recepciones — Arthur Meza
 
 Registro y control de recepciones de productos. Flujo completo: registro → verificación → confirmación (actualiza stock automáticamente) o rechazo.
 
