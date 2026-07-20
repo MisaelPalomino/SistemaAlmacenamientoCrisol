@@ -13,7 +13,8 @@ def health_check(request):
         'version': '1.0.0',
         'integrantes': [
             'Integrante 1 - Servicio de Productos',
-            'Integrante 2 - Servicio de Recepciones',
+            'Integrante 2 - Servicio de Proveedores',
+            'Integrante 3 - Servicio de Recepciones',
         ]
     })
 
@@ -26,9 +27,6 @@ urlpatterns = [
     
     # ===== SERVICIO DE PRODUCTOS =====
     path('api/productos/', include('presentacion.urls.producto_urls')),
-    <<<<<<< Proveedores
     path('api/proveedores/', include('presentacion.urls.proveedor_urls')),
     path('api/recepciones/', include('presentacion.urls.recepcion_urls')),
-    ]
-    >>>>>>> main
-
+]

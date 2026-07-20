@@ -46,7 +46,50 @@ CRUD completo de productos con alertas de stock, valor de inventario y filtros.
 
 ---
 
-### Servicio de Recepciones — Integrante 2
+### Servicio de Proveedores — Integrante 2
+
+CRUD completo de proveedores con búsqueda por RUC, clasificación, filtros y desactivación lógica.
+
+#### Endpoints
+
+| Método | Endpoint                                      | Descripción                              |
+|--------|-----------------------------------------------|------------------------------------------|
+| POST   | `/api/proveedores/`                           | Crear proveedor                          |
+| GET    | `/api/proveedores/`                           | Listar proveedores activos               |
+| GET    | `/api/proveedores/{id}/`                      | Obtener proveedor activo por ID          |
+| PUT    | `/api/proveedores/{id}/`                      | Actualizar proveedor y calificación      |
+| DELETE | `/api/proveedores/{id}/`                      | Desactivar proveedor (soft-delete)       |
+| GET    | `/api/proveedores/buscar/?ruc={ruc}`          | Buscar proveedor activo por RUC          |
+| POST   | `/api/proveedores/{id}/activar/`              | Reactivar proveedor                      |
+| PATCH  | `/api/proveedores/{id}/activar/`              | Reactivar proveedor                      |
+
+#### Filtros (`GET /api/proveedores/`)
+
+| Parámetro       | Descripción                                      |
+|-----------------|--------------------------------------------------|
+| `calificacion`  | Filtrar por calificación `A`, `B`, `C` o `D`    |
+
+#### Validaciones
+
+- RUC obligatorio de exactamente 11 dígitos.
+- RUC único para proveedores activos o desactivados.
+- Calificación limitada a `A`, `B`, `C` o `D`.
+- Plazo de entrega mayor que cero.
+- Correo electrónico con formato válido.
+- Desactivación lógica mediante el campo `activo`.
+
+#### Calificaciones
+
+| Código | Descripción |
+|--------|-------------|
+| `A`    | Excelente   |
+| `B`    | Bueno       |
+| `C`    | Regular     |
+| `D`    | Malo        |
+
+---
+
+### Servicio de Recepciones — Integrante 3
 
 Registro y control de recepciones de productos. Flujo completo: registro → verificación → confirmación (actualiza stock automáticamente) o rechazo.
 
@@ -108,19 +151,24 @@ PENDIENTE ──→ VERIFICADA ──→ CONFIRMADA
 │   └── almacen.py
 ├── 📁 aplicacion/services/          # Lógica de negocio
 │   ├── producto_service.py
+│   ├── proveedor_service.py
 │   └── recepcion_service.py
 ├── 📁 presentacion/
 │   ├── 📁 views/
 │   │   ├── producto_views.py
+│   │   ├── proveedor_views.py
 │   │   └── recepcion_views.py
 │   ├── 📁 serializers/
 │   │   ├── producto_serializer.py
+│   │   ├── proveedor_serializer.py
 │   │   └── recepcion_serializer.py
 │   └── 📁 urls/
 │       ├── producto_urls.py
+│       ├── proveedor_urls.py
 │       └── recepcion_urls.py
 ├── 📁 tests/
-│   └── test_recepcion_api.py        # Pruebas (5 casos BDD)
+│   ├── test_proveedor_api.py        # Pruebas de proveedores (5 casos)
+│   └── test_recepcion_api.py        # Pruebas de recepciones (5 casos BDD)
 ├── manage.py
 └── requirements.txt
 ```
@@ -166,6 +214,51 @@ curl http://localhost:8000/api/productos/buscar/?isbn=9786120012345
 # Alertas de stock bajo
 curl http://localhost:8000/api/productos/alertas_stock_bajo/
 ```
+
+### Proveedores
+
+```bash
+# Crear proveedor
+curl -X POST http://localhost:8000/api/proveedores/ \
+  -H "Content-Type: application/json" \
+  -d '{
+    "ruc": "20123456789",
+    "razon_social": "Distribuidora Crisol SAC",
+    "nombre_comercial": "Distribuidora Crisol",
+    "direccion_calle": "Avenida Arequipa",
+    "direccion_numero": "1234",
+    "direccion_distrito": "Lince",
+    "direccion_provincia": "Lima",
+    "direccion_departamento": "Lima",
+    "email": "ventas@distribuidoracrisol.pe",
+    "telefono": "987654321",
+    "especialidad": "Libros y material educativo",
+    "plazo_entrega_dias": 5,
+    "condiciones_pago": "Crédito a 30 días",
+    "calificacion": "A",
+    "es_nacional": true
+  }'
+
+# Buscar por RUC
+curl "http://localhost:8000/api/proveedores/buscar/?ruc=20123456789"
+
+# Filtrar por calificación
+curl "http://localhost:8000/api/proveedores/?calificacion=A"
+
+# Desactivar proveedor
+curl -X DELETE http://localhost:8000/api/proveedores/1/
+
+# Reactivar proveedor
+curl -X POST http://localhost:8000/api/proveedores/1/activar/
+```
+
+#### Pruebas de proveedores
+
+```bash
+python manage.py test tests.test_proveedor_api
+```
+
+El módulo incluye cinco casos automatizados: creación con RUC válido, búsqueda por RUC, listado por calificación, actualización de calificación y desactivación lógica.
 
 ### Recepciones
 
