@@ -25,10 +25,10 @@ urlpatterns = [
     path('api/health/', health_check, name='health_check'),
     
     # ===== SERVICIO DE PRODUCTOS =====
-    # ✅ Incluir las URLs de productos
     path('api/productos/', include('presentacion.urls.producto_urls')),
-
-    # ===== SERVICIO DE RECEPCIONES =====
-    # ✅ Incluir las URLs de recepciones
+    <<<<<<< Proveedores
+    path('api/proveedores/', include('presentacion.urls.proveedor_urls')),
     path('api/recepciones/', include('presentacion.urls.recepcion_urls')),
-]
+    ]
+    >>>>>>> main
+
