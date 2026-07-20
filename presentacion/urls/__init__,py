@@ -1,9 +1,0 @@
-"""
-URLs de la capa de presentación
-"""
-from .producto_urls import urlpatterns as producto_urls
-
-urlpatterns = []
-urlpatterns += producto_urls
-
-__all__ = ['urlpatterns']
