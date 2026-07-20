@@ -24,4 +24,5 @@ urlpatterns = [
     # ===== SERVICIO DE PRODUCTOS =====
     # ✅ Incluir las URLs de productos
     path('api/productos/', include('presentacion.urls.producto_urls')),
+    path('api/proveedores/', include('presentacion.urls.proveedor_urls')),
 ]
