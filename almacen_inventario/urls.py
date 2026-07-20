@@ -11,7 +11,10 @@ def health_check(request):
         'status': 'ok',
         'service': 'Sistema de Almacenamiento - Librerías Crisol',
         'version': '1.0.0',
-        'integrante': 'Integrante 1 - Servicio de Productos'
+        'integrantes': [
+            'Integrante 1 - Servicio de Productos',
+            'Integrante 2 - Servicio de Recepciones',
+        ]
     })
 
 urlpatterns = [
@@ -22,7 +25,10 @@ urlpatterns = [
     path('api/health/', health_check, name='health_check'),
     
     # ===== SERVICIO DE PRODUCTOS =====
-    # ✅ Incluir las URLs de productos
     path('api/productos/', include('presentacion.urls.producto_urls')),
+    <<<<<<< Proveedores
     path('api/proveedores/', include('presentacion.urls.proveedor_urls')),
-]
+    path('api/recepciones/', include('presentacion.urls.recepcion_urls')),
+    ]
+    >>>>>>> main
+
