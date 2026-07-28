@@ -186,7 +186,7 @@ class RecepcionService:
             raise ValueError(f"Recepción con ID {recepcion_id} no encontrada")
         except Producto.DoesNotExist:
             raise ValueError(
-                f"Producto asociado a la recepción no encontrado"
+                "Producto asociado a la recepción no encontrado"  
             )
         except ValueError as e:
             raise ValueError(str(e))
