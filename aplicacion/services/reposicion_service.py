@@ -26,9 +26,6 @@ class ReposicionService:
         try:
             # Verificar que el producto existe
             producto_id = data.get("producto_id")
-            if producto_id:
-                producto = Producto.objects.get(id=producto_id, activo=True)
-
             solicitud = SolicitudReposicion(**data)
             solicitud.full_clean()
             solicitud.save()

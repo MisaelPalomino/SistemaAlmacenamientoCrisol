@@ -33,9 +33,10 @@ class ProductoService:
                     id=data['proveedor_principal_id'],
                     activo=True
                 )
+                data['proveedor_principal'] = proveedor
             
             producto = Producto(**data)
-            producto.full_clean()  # Ejecuta validaciones del modelo
+            producto.full_clean()
             producto.save()
             return producto
             
@@ -166,17 +167,18 @@ class ProductoService:
         """
         try:
             producto = Producto.objects.get(id=producto_id)
-            
+
             # Validar que el proveedor existe si se envía
             if data.get('proveedor_principal_id'):
                 proveedor = Proveedor.objects.get(
                     id=data['proveedor_principal_id'],
                     activo=True
                 )
-            
-            # Actualizar campos
+                producto.proveedor_principal = proveedor
+
             for key, value in data.items():
-                setattr(producto, key, value)
+                if key != 'proveedor_principal_id':  # Evitar conflicto
+                    setattr(producto, key, value)
             
             producto.full_clean()
             producto.save()

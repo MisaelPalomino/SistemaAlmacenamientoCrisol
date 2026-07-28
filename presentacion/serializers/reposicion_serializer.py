@@ -64,7 +64,7 @@ class SolicitudReposicionSerializer(serializers.ModelSerializer):
     def validate_producto(self, value):
         """Valida que el producto exista y esté activo"""
         try:
-            producto = Producto.objects.get(id=value.id, activo=True)
+            _ = Producto.objects.get(id=value.id, activo=True) 
         except Producto.DoesNotExist:
             raise serializers.ValidationError(
                 f"Producto con ID {value.id} no encontrado o inactivo"

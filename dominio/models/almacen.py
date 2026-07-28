@@ -28,8 +28,8 @@ class Almacen(models.Model):
     direccion_distrito = models.CharField(max_length=100)
     direccion_provincia = models.CharField(max_length=100)
     direccion_departamento = models.CharField(max_length=100)
-    direccion_codigo_postal = models.CharField(max_length=10, blank=True, null=True)
-    direccion_referencia = models.TextField(blank=True, null=True)
+    direccion_codigo_postal = models.CharField(max_length=10, blank=True)  
+    direccion_referencia = models.TextField(blank=True)  
     
     # ========== CONTACTO ==========
     email = models.EmailField()

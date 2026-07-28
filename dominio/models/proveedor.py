@@ -4,7 +4,7 @@ from django.core.exceptions import ValidationError
 class Proveedor(models.Model):
     """Modelo Proveedor - Librerías Crisol"""
     
-    CALIFICACION = [
+    CALIFICACION_CHOICES = [
         ('A', 'Excelente'),
         ('B', 'Bueno'),
         ('C', 'Regular'),
@@ -20,8 +20,8 @@ class Proveedor(models.Model):
     direccion_distrito = models.CharField(max_length=100)
     direccion_provincia = models.CharField(max_length=100)
     direccion_departamento = models.CharField(max_length=100)
-    direccion_codigo_postal = models.CharField(max_length=10, blank=True, null=True)
-    direccion_referencia = models.TextField(blank=True, null=True)
+    direccion_codigo_postal = models.CharField(max_length=10, blank=True)
+    direccion_referencia = models.TextField(blank=True)
     
     email = models.EmailField()
     telefono = models.CharField(max_length=20)
@@ -30,7 +30,7 @@ class Proveedor(models.Model):
     especialidad = models.CharField(max_length=100)
     plazo_entrega_dias = models.PositiveIntegerField()
     condiciones_pago = models.CharField(max_length=100)
-    calificacion = models.CharField(max_length=1, choices=CALIFICACION, default='B')
+    calificacion = models.CharField(max_length=1, choices=CALIFICACION_CHOICES, default='B')
     es_nacional = models.BooleanField(default=True)
     
     activo = models.BooleanField(default=True)
