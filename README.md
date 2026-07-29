@@ -55,9 +55,12 @@ de persistencia.
 #### Flujo de Control en Capas DDD
 
 [Cliente] → [API REST] → [Servicio Aplicación] → [ORM Django] → [Base de Datos]
+
    ↑             ↓               ↓                    ↓
 [Notificación] [Serializer]   [Lógica Negocio]   [Transacciones]
+
    ↑             ↓               ↓                    ↓
+   
 [Integración]   [DTO]          [Validaciones]     [Migraciones]
 
 #### Caso concreto: Proceso de Venta en Tienda
