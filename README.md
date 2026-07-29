@@ -52,17 +52,6 @@ de persistencia.
 - Se mantiene la separación de capas sin añadir complejidad artificial
 - Las reglas de negocio (stock mínimo, validaciones de ISBN, políticas de cambio) se implementan directamente en los modelos
 
-#### Flujo de Control en Capas DDD
-
-[Cliente] → [API REST] → [Servicio Aplicación] → [ORM Django] → [Base de Datos]
-
-   ↑             ↓               ↓                    ↓
-[Notificación] [Serializer]   [Lógica Negocio]   [Transacciones]
-
-   ↑             ↓               ↓                    ↓
-   
-[Integración]   [DTO]          [Validaciones]     [Migraciones]
-
 #### Caso concreto: Proceso de Venta en Tienda
 
 1. Cliente solicita libro (presentacion/views/venta_views.py)
