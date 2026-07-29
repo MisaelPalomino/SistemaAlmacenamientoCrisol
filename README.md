@@ -203,6 +203,48 @@ PENDIENTE ──→ VERIFICADA ──→ CONFIRMADA
 | `CONFIRMADA`       | Confirmada, stock del producto actualizado     |
 | `RECHAZADA`        | Rechazada                                      |
 
+### - Servicio de Gestión de Pedidos Online (E-commerce) - Gonzalo R. Zapana 
+
+El servicio de Gestión de Pedidos Online gestiona todo el ciclo de vida de las compras realizadas a través de la tienda virtual de Librerías Crisol S.A.C. 
+Permite a los clientes seleccionar productos, realizar pagos electrónicos, y hacer seguimiento de sus pedidos desde la confirmación hasta la entrega final. 
+El servicio integra pasarelas de pago (Izipay, Yape, Plin), couriers (Olva, Shalom, Serpost) y facturación electrónica con SUNAT, garantizando la consistencia 
+del inventario en tiempo real mediante transacciones atónicas.
+
+#### Endpoints
+
+| Método | 	Endpoint	                 | Descripción                                             |
+|--------|-------------------------------|---------------------------------------------------------| 
+| POST	 | /api/pedidos/	             | Crear un nuevo pedido desde la tienda virtual           | 
+| GET	 | /api/pedidos/{id}/	         | Obtener detalles de un pedido específico                | 
+| GET	 | /api/pedidos/	             | Listar todos los pedidos del cliente autenticado        | 
+| PUT	 | /api/pedidos/{id}/cancelar/	 | Cancelar un pedido (solo si está en estado "PENDIENTE") | 
+| POST	 | /api/pedidos/{id}/pago/	     | Procesar el pago de un pedido                           | 
+| GET	 | /api/pedidos/{id}/tracking/	 | Obtener estado de seguimiento del envío                 | 
+| POST	 | /api/pedidos/{id}/devolucion/ | Solicitar devolución de un pedido entregado             | 
+
+#### Filtros (GET /api/pedidos/)
+
+| Parámetro	    | Tipo	  | Descripción	                      | Ejemplo                  | 
+|---------------|---------|-----------------------------------|--------------------------| 
+| estado	    | String  | Filtrar por estado del pedido	  | ?estado=PAGADO           | 
+| fecha_inicio  | Date	  | Filtrar pedidos desde una fecha	  | ?fecha_inicio=2026-07-01 | 
+| fecha_fin	    | Date	  | Filtrar pedidos hasta una fecha	  | ?fecha_fin=2026-07-31    | 
+| cliente_dni	| String  | Filtrar por DNI del cliente	      | ?cliente_dni=12345678    | 
+| metodo_pago	| String  | Filtrar por método de pago	      | ?metodo_pago=YAPE        | 
+
+#### Ejemplos de consulta 
+
+```bash
+# Listar pedidos pendientes
+GET /api/pedidos/?estado=PENDIENTE
+
+# Listar pedidos de un cliente específico
+GET /api/pedidos/?cliente_dni=12345678
+
+# Listar pedidos pagados con Yape en julio 2026
+GET /api/pedidos/?metodo_pago=YAPE&fecha_inicio=2026-07-01&fecha_fin=2026-07-31
+```
+
 ## Estructura del Proyecto
 
 ```
