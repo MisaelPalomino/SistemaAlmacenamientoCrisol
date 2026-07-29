@@ -11,6 +11,8 @@ Proyecto Django con arquitectura en capas (DDD) para la gestión de inventario d
 | Presentación     | `presentacion`    | API REST (views, serializers)     |
 | Infraestructura  | `infraestructura` | Integraciones externas            |
 
+### Visión de la Arquitectura
+
 ## Servicios
 
 ### Servicio de Productos — Misael Palomino
