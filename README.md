@@ -22,12 +22,12 @@ a datos dentro de la infraestructura.
 
 ### Mapeo de Capas DDD con Procesos de Negocio Crisol
 
-| Capa DDD	         | App/Componente	               | Propósito	                                      | Procesos Crisol Soportados                                           |
-|--------------------|---------------------------------|--------------------------------------------------|----------------------------------------------------------------------|
-| Dominio	         | dominio/models/	               | Entidades, Value Objects, Agregados	          | Abastecimiento, Inventario, Ventas, Atención, Marketing, E-commerce  |
-| Aplicación	     | aplicacion/services/	           | Casos de uso, lógica orquestadora	              | Orquestación de procesos BPMN                                        |
-| Presentación	     | presentacion/	               | API REST, DTOs (Serializers)	                  | Interfaces para tienda física, web y móvil                           | 
-| Infraestructura	 | Django ORM + Integraciones	   | Persistencia, APIs externas, notificaciones	  | SUNAT, pasarelas de pago, couriers, CRM                              | 
+| Capa DDD	         | App/Componente	               | Propósito	                                       | Procesos Crisol Soportados                                           |
+|--------------------|--------------------------------|--------------------------------------------------|----------------------------------------------------------------------|
+| Dominio	         | dominio/models/	               | Entidades, Value Objects, Agregados	            | Abastecimiento, Inventario, Ventas, Atención, Marketing, E-commerce  |
+| Aplicación	      | aplicacion/services/	         | Casos de uso, lógica orquestadora	               | Orquestación de procesos BPMN                                        |
+| Presentación	      | presentacion/	               | API REST, DTOs (Serializers)	                  | Interfaces para tienda física, web y móvil                           | 
+| Infraestructura	   | Django ORM + Integraciones	   | Persistencia, APIs externas, notificaciones	   | SUNAT, pasarelas de pago, couriers, CRM                              | 
 
 ### Principios Arquitectónicos
 
@@ -73,9 +73,26 @@ de persistencia.
 
 #### Mapeo de Procesos BPMN a Componentes Django
 
+| Proceso Crisol	   | Entidad BPMN	              | Modelo Django          | Servicio Aplicación	 | Integración                 | 
+|--------------------|----------------------------|------------------------|------------------------|-----------------------------|
+| Abastecimiento	   | OrdenCompra, Proveedor     | OrdenCompra, Proveedor | AbastecimientoService	 | Email, ERP                  | 
+| Gestión Inventario |	Producto, EntradaProducto | Producto, Recepcion	   | InventarioService	    | -                           |
+| Ventas Tienda      |	VentaTienda	              | Venta, Cliente	      | VentaService	          | SUNAT, Pasarela Pago        |
+| Atención Cliente   |	Ticket, Cliente	        | Atencion, Ticket	      | AtencionService	       | CRM, Notificaciones         |
+| Marketing	         | Campaña, Promoción	        | Campaña, Promocion	   | MarketingService	    | Email Marketing, Analytics  |
+| Pedidos Online	   | Pedido, Envio, Pago	     | Pedido, Envio, Pago	   | PedidoService	       | Courier, Pasarela Pago      |
 
 #### Ventajas en el Contexto DDD para Crisol
 
+| Aspecto DDD	            | Implementación en Crisol	                           | Proceso de Negocio Asociado          |
+|--------------------------|-----------------------------------------------------|--------------------------------------| 
+| Entidades	               | Modelos Django con métodos de dominio	            | Producto, Proveedor, Cliente, Pedido |
+| Value Objects	         | Campos con lógica de validación (ISBN, DNI, Email)	| Validación de RUC, DNI, emails       | 
+| Agregados	               | Relaciones entre modelos gestionadas por ORM	      | Pedido → DetallePedido → Producto    | 
+| Servicios de Dominio	   | Métodos en modelos para reglas específicas	         | Producto.validar_stock_minimo()      | 
+| Servicios de Aplicación	| Orquestan casos de uso con transaction.atomic()	   | Procesar venta, registrar recepción  | 
+| Repositorios	            | Reemplazados por QuerySets de Django	               | Todas las consultas BPMN             | 
+| Eventos de Dominio	      | Signals de Django (stock bajo, pedido creado)	      | Alertas automáticas de reposición    | 
 
 #### Gestión de Transacciones y Consistencia
 
