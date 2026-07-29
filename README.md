@@ -22,7 +22,12 @@ a datos dentro de la infraestructura.
 
 ### Mapeo de Capas DDD con Procesos de Negocio Crisol
 
-
+| Capa DDD	         | App/Componente	               | Propósito	                                      | Procesos Crisol Soportados                                           |
+|--------------------|---------------------------------|--------------------------------------------------|----------------------------------------------------------------------|
+| Dominio	         | dominio/models/	               | Entidades, Value Objects, Agregados	          | Abastecimiento, Inventario, Ventas, Atención, Marketing, E-commerce  |
+| Aplicación	     | aplicacion/services/	           | Casos de uso, lógica orquestadora	              | Orquestación de procesos BPMN                                        |
+| Presentación	     | presentacion/	               | API REST, DTOs (Serializers)	                  | Interfaces para tienda física, web y móvil                           | 
+| Infraestructura	 | Django ORM + Integraciones	   | Persistencia, APIs externas, notificaciones	  | SUNAT, pasarelas de pago, couriers, CRM                              | 
 
 ### Principios Arquitectónicos
 
@@ -46,6 +51,67 @@ de persistencia.
 - Curva de aprendizaje más baja para nuevos desarrolladores
 - Se mantiene la separación de capas sin añadir complejidad artificial
 - Las reglas de negocio (stock mínimo, validaciones de ISBN, políticas de cambio) se implementan directamente en los modelos
+
+#### Flujo de Control en Capas DDD
+
+[Cliente] → [API REST] → [Servicio Aplicación] → [ORM Django] → [Base de Datos]
+   ↑             ↓               ↓                    ↓
+[Notificación] [Serializer]   [Lógica Negocio]   [Transacciones]
+   ↑             ↓               ↓                    ↓
+[Integración]   [DTO]          [Validaciones]     [Migraciones]
+
+#### Caso concreto: Proceso de Venta en Tienda
+
+1. Cliente solicita libro (presentacion/views/venta_views.py)
+2. Asesor consulta stock vía API (presentacion/serializers/)
+3. Servicio valida disponibilidad (aplicacion/services/venta_service.py)
+4. ORM consulta Producto.objects.filter(isbn=...)
+5. Si hay stock, procesa pago (infraestructura/integraciones/pasarela_pago.py)
+6. ORM actualiza stock: Producto.objects.filter(id=...).update(stock=F('stock')-1)
+7. Servicio genera factura (infraestructura/integraciones/sunat.py)
+8. Notifica al cliente (infraestructura/integraciones/notificaciones.py)
+
+#### Mapeo de Procesos BPMN a Componentes Django
+
+
+#### Ventajas en el Contexto DDD para Crisol
+
+
+#### Gestión de Transacciones y Consistencia
+
+Los procesos de negocio de Crisol requieren consistencia transaccional, especialmente en:
+
+- Compra online: Validar stock → Cobrar → Actualizar inventario → Generar guía
+- Venta en tienda: Verificar stock → Cobrar → Actualizar inventario → Facturar
+- Recepción: Registrar ingreso → Actualizar stock → Conciliar con orden de compra
+
+Django ORM maneja esto de forma nativa:
+
+```bash
+from django.db import transaction
+
+@transaction.atomic
+def procesar_pedido_completo(datos_pedido):
+    # Todas las operaciones son atómicas
+    pedido = Pedido.objects.create(...)
+    for item in datos_pedido['items']:
+        Producto.objects.filter(id=item.id).update(
+            stock=F('stock') - item.cantidad
+        )
+        DetallePedido.objects.create(pedido=pedido, ...)
+    Pago.objects.create(pedido=pedido, ...)
+    # Si algo falla, todo se revierte
+```
+
+#### Escalabilidad y Rendimiento
+
+A pesar de no usar repositorios, el sistema es escalable gracias a:
+
+- QuerySets optimizados: select_related(), prefetch_related(), only(), defer()
+- Transacciones explícitas: Control fino con transaction.atomic()
+- Caché: Django Cache Framework para consultas frecuentes
+- Índices: Definidos en modelos para consultas rápidas (ISBN, DNI, fechas)
+- Lecturas replicadas: Configuración de múltiples bases de datos
 
 ## Servicios
 
