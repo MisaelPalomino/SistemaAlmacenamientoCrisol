@@ -13,6 +13,40 @@ Proyecto Django con arquitectura en capas (DDD) para la gestión de inventario d
 
 ### Visión de la Arquitectura
 
+El Sistema de Almacenamiento Crisol está diseñado con una arquitectura en capas basada en DDD (Domain-Driven Design), implementada sobre Django REST Framework. 
+Esta arquitectura refleja los procesos de negocio documentados en el análisis BPMN de Librerías Crisol S.A.C., abarcando la Gestión de Abastecimiento, Gestión de 
+Inventario, Ventas en Tienda, Atención al Cliente, Marketing y Promoción, y Gestión de Pedidos Online.
+
+Una característica fundamental de esta arquitectura es la ausencia de repositorios (repos), reemplazándolos directamente con el ORM de Django como capa de acceso 
+a datos dentro de la infraestructura.
+
+### Mapeo de Capas DDD con Procesos de Negocio Crisol
+
+
+
+### Principios Arquitectónicos
+
+No Uso de Repositorios (Repository Pattern)
+Decisión estratégica: En lugar de implementar un patrón repositorio, utilizamos directamente el ORM de Django como la capa de infraestructura para todas las operaciones 
+de persistencia.
+
+#### ¿Por qué?
+
+- El ORM de Django ya proporciona una abstracción suficientemente robusta y expresiva
+- La capa de infraestructura es transparente al dominio
+- Los servicios de aplicación pueden acceder directamente a Model.objects.*
+- Django ORM incluye características avanzadas (lazy loading, transacciones, migraciones)
+- Alineado con el análisis BPMN: Las entidades definidas en los modelos de datos de Bonita se mapean directamente a modelos Django
+
+#### Beneficios en el contexto Crisol:
+
+- Menor código boilerplate y menos archivos
+- Mayor simplicidad en el mantenimiento
+- Aprovechamiento completo de las características nativas de Django
+- Curva de aprendizaje más baja para nuevos desarrolladores
+- Se mantiene la separación de capas sin añadir complejidad artificial
+- Las reglas de negocio (stock mínimo, validaciones de ISBN, políticas de cambio) se implementan directamente en los modelos
+
 ## Servicios
 
 ### Servicio de Productos — Misael Palomino
