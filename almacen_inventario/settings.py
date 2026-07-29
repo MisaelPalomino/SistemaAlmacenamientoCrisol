@@ -3,13 +3,28 @@
 import os
 from pathlib import Path
 
+from dotenv import load_dotenv
+
 # Build paths
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Carga las variables locales desde .env si el archivo existe.
+# Las variables definidas en el sistema conservan prioridad.
+load_dotenv(BASE_DIR / '.env')
 
 # SECURITY
 SECRET_KEY = 'django-insecure-@&$h&7^3n(zm*2$6%x!p9q$^&*()_+{}:L<>?'
 DEBUG = True
 ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+
+# RABBITMQ
+RABBITMQ = {
+    'HOST': os.getenv('RABBITMQ_HOST', 'localhost'),
+    'PORT': int(os.getenv('RABBITMQ_PORT', '5672')),
+    'USER': os.getenv('RABBITMQ_USER', 'guest'),
+    'PASSWORD': os.getenv('RABBITMQ_PASSWORD', 'guest'),
+    'VIRTUAL_HOST': os.getenv('RABBITMQ_VIRTUAL_HOST', '/'),
+}
 
 INSTALLED_APPS = [
     'django.contrib.admin',
