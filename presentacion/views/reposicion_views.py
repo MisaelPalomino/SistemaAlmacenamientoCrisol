@@ -7,6 +7,7 @@ from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from aplicacion.services.reposicion_service import ReposicionService
+from dominio.models.reposicion import SolicitudReposicion
 from presentacion.serializers.reposicion_serializer import (
     SolicitudReposicionSerializer,
     ReposicionListSerializer,
@@ -18,6 +19,9 @@ class ReposicionViewSet(viewsets.ViewSet):
     """
     ViewSet para Solicitudes de Reposición
     """
+
+    queryset = SolicitudReposicion.objects.none()
+    serializer_class = SolicitudReposicionSerializer
 
     def list(self, request):
         """GET /api/reposiciones/ - Listar solicitudes"""

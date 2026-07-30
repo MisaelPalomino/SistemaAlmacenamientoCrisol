@@ -7,6 +7,7 @@ from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from aplicacion.services.producto_service import ProductoService
+from dominio.models.producto import Producto
 from presentacion.serializers.producto_serializer import (
     ProductoSerializer,
     ProductoListSerializer,
@@ -18,6 +19,9 @@ class ProductoViewSet(viewsets.ViewSet):
     """
     ViewSet para el servicio de Productos
     """
+
+    queryset = Producto.objects.none()
+    serializer_class = ProductoSerializer
 
     def list(self, request):
         """GET /api/productos/"""

@@ -11,6 +11,20 @@ Proyecto Django con arquitectura en capas (DDD) para la gestión de inventario d
 | Presentación     | `presentacion`    | API REST (views, serializers)     |
 | Infraestructura  | `infraestructura` | Integraciones externas y RabbitMQ |
 
+## Documentación OpenAPI
+
+Con el servidor Django en ejecución, la documentación interactiva está
+disponible en:
+
+| Recurso | URL |
+|---------|-----|
+| Esquema OpenAPI | `http://localhost:8000/api/schema/` |
+| Swagger UI | `http://localhost:8000/api/docs/` |
+| ReDoc | `http://localhost:8000/api/redoc/` |
+
+Swagger UI y ReDoc utilizan recursos locales, por lo que no requieren conexión
+a una CDN durante la demostración.
+
 ## Servicios
 
 ### Servicio de Productos — Misael Palomino
@@ -225,7 +239,8 @@ Las colas son durables, las respuestas son persistentes y el consumidor utiliza 
 │   ├── test_producto_api.py
 │   ├── test_recepcion_api.py
 │   ├── test_incidencia_api.py
-│   └── test_inventario_consumer.py
+│   ├── test_inventario_consumer.py
+│   └── test_openapi.py
 ├── .env.example
 ├── manage.py
 └── requirements.txt

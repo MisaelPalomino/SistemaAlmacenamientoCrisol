@@ -36,6 +36,8 @@ INSTALLED_APPS = [
     
     # Third party
     'rest_framework',
+    'drf_spectacular',
+    'drf_spectacular_sidecar',
     'corsheaders',
     
     'dominio',
@@ -102,11 +104,44 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CORS_ALLOW_ALL_ORIGINS = True
 
 REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'DEFAULT_RENDERER_CLASSES': [
         'rest_framework.renderers.JSONRenderer',
     ],
     'DEFAULT_PARSER_CLASSES': [
         'rest_framework.parsers.JSONParser',
+    ],
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Sistema de Almacenamiento Crisol API',
+    'DESCRIPTION': (
+        'API REST para gestionar productos, recepciones, reposiciones '
+        'e incidencias del almacén de Librerías Crisol.'
+    ),
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'COMPONENT_SPLIT_REQUEST': True,
+    'SWAGGER_UI_DIST': 'SIDECAR',
+    'SWAGGER_UI_FAVICON_HREF': 'SIDECAR',
+    'REDOC_DIST': 'SIDECAR',
+    'TAGS': [
+        {
+            'name': 'productos',
+            'description': 'Gestión y control de productos e inventario.',
+        },
+        {
+            'name': 'recepciones',
+            'description': 'Registro y validación de recepciones.',
+        },
+        {
+            'name': 'reposiciones',
+            'description': 'Gestión de solicitudes de reposición.',
+        },
+        {
+            'name': 'incidencias',
+            'description': 'Registro y seguimiento de incidencias.',
+        },
     ],
 }
 
