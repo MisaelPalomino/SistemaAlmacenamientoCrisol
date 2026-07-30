@@ -3,13 +3,28 @@
 import os
 from pathlib import Path
 
+from dotenv import load_dotenv
+
 # Build paths
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Carga las variables locales desde .env si el archivo existe.
+# Las variables definidas en el sistema conservan prioridad.
+load_dotenv(BASE_DIR / '.env')
 
 # SECURITY
 SECRET_KEY = 'django-insecure-@&$h&7^3n(zm*2$6%x!p9q$^&*()_+{}:L<>?'
 DEBUG = True
 ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+
+# RABBITMQ
+RABBITMQ = {
+    'HOST': os.getenv('RABBITMQ_HOST', 'localhost'),
+    'PORT': int(os.getenv('RABBITMQ_PORT', '5672')),
+    'USER': os.getenv('RABBITMQ_USER', 'guest'),
+    'PASSWORD': os.getenv('RABBITMQ_PASSWORD', 'guest'),
+    'VIRTUAL_HOST': os.getenv('RABBITMQ_VIRTUAL_HOST', '/'),
+}
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -21,6 +36,8 @@ INSTALLED_APPS = [
     
     # Third party
     'rest_framework',
+    'drf_spectacular',
+    'drf_spectacular_sidecar',
     'corsheaders',
     
     'dominio',
@@ -87,10 +104,67 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CORS_ALLOW_ALL_ORIGINS = True
 
 REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'DEFAULT_RENDERER_CLASSES': [
         'rest_framework.renderers.JSONRenderer',
     ],
     'DEFAULT_PARSER_CLASSES': [
         'rest_framework.parsers.JSONParser',
     ],
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Sistema de Almacenamiento Crisol API',
+    'DESCRIPTION': (
+        'API REST para gestionar productos, recepciones, reposiciones '
+        'e incidencias del almacén de Librerías Crisol.'
+    ),
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'COMPONENT_SPLIT_REQUEST': True,
+    'SWAGGER_UI_DIST': 'SIDECAR',
+    'SWAGGER_UI_FAVICON_HREF': 'SIDECAR',
+    'REDOC_DIST': 'SIDECAR',
+    'TAGS': [
+        {
+            'name': 'productos',
+            'description': 'Gestión y control de productos e inventario.',
+        },
+        {
+            'name': 'recepciones',
+            'description': 'Registro y validación de recepciones.',
+        },
+        {
+            'name': 'reposiciones',
+            'description': 'Gestión de solicitudes de reposición.',
+        },
+        {
+            'name': 'incidencias',
+            'description': 'Registro y seguimiento de incidencias.',
+        },
+    ],
+}
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'rabbitmq': {
+            'format': '{asctime} {levelname} {name}: {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'rabbitmq_console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'rabbitmq',
+        },
+    },
+    'loggers': {
+        'infraestructura.rabbitmq.inventario_consumer': {
+            'handlers': ['rabbitmq_console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+    },
 }

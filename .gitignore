@@ -10,6 +10,7 @@ __pycache__/
 .Python
 env/
 venv/
+.venv/
 ENV/
 env.bak/
 venv.bak/
@@ -177,3 +178,6 @@ __pycache__/
 *.pyo
 *.pyd
 .Python
+
+# Conector temporal generado para Bonita Studio
+.tmp_bonita_connector/

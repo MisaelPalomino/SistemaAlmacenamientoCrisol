@@ -4,12 +4,27 @@ URLs principales del proyecto
 
 from django.contrib import admin
 from django.urls import path, include
-from django.http import JsonResponse
+from drf_spectacular.views import (
+    SpectacularAPIView,
+    SpectacularRedocView,
+    SpectacularSwaggerView,
+)
 
 urlpatterns = [
     # Admin
     path("admin/", admin.site.urls),
-    # Health Check
+    # Documentación OpenAPI
+    path("api/schema/", SpectacularAPIView.as_view(), name="api-schema"),
+    path(
+        "api/docs/",
+        SpectacularSwaggerView.as_view(url_name="api-schema"),
+        name="swagger-ui",
+    ),
+    path(
+        "api/redoc/",
+        SpectacularRedocView.as_view(url_name="api-schema"),
+        name="redoc",
+    ),
     # ===== SERVICIO DE PRODUCTOS =====
     path("api/productos/", include("presentacion.urls.producto_urls")),
     # ===== SERVICIO DE RECEPCIONES =====

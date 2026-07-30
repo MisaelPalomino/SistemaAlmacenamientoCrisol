@@ -7,6 +7,7 @@ from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from aplicacion.services.incidencia_service import IncidenciaService
+from dominio.models.incidencia import Incidencia
 from presentacion.serializers.incidencia_serializer import (
     IncidenciaSerializer,
     IncidenciaListSerializer,
@@ -19,6 +20,9 @@ class IncidenciaViewSet(viewsets.ViewSet):
     """
     ViewSet para Incidencias
     """
+
+    queryset = Incidencia.objects.none()
+    serializer_class = IncidenciaSerializer
 
     def list(self, request):
         """GET /api/incidencias/ - Listar incidencias"""

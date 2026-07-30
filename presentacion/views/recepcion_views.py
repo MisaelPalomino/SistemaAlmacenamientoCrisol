@@ -2,6 +2,7 @@ from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from aplicacion.services.recepcion_service import RecepcionService
+from dominio.models.recepcion import Recepcion
 from presentacion.serializers.recepcion_serializer import (
     RecepcionSerializer,
     RecepcionListSerializer,
@@ -9,6 +10,9 @@ from presentacion.serializers.recepcion_serializer import (
 
 
 class RecepcionViewSet(viewsets.ViewSet):
+
+    queryset = Recepcion.objects.none()
+    serializer_class = RecepcionSerializer
 
     def list(self, request):
         try:

@@ -20,3 +20,7 @@ python-dateutil==2.8.2
 # Para números y decimales
 ipython==8.17.2
 django-extensions==3.2.3
+
+pika==1.3.2
+drf-spectacular==0.30.0
+drf-spectacular-sidecar==2026.7.1
