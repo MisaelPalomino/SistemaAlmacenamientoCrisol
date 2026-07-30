@@ -159,6 +159,14 @@ A pesar de no usar repositorios, el sistema es escalable gracias a:
 - Índices: Definidos en modelos para consultas rápidas (ISBN, DNI, fechas)
 - Lecturas replicadas: Configuración de múltiples bases de datos
 
+### Visión General
+El Sistema de Almacenamiento Crisol está diseñado con una arquitectura en capas basada en DDD (Domain-Driven Design), implementada sobre Django REST Framework. 
+Esta arquitectura refleja los procesos de negocio documentados en el análisis BPMN de Librerías Crisol S.A.C., abarcando la Gestión de Abastecimiento, Gestión de 
+Inventario, Ventas en Tienda, Atención al Cliente, Marketing y Promoción, y Gestión de Pedidos Online.
+
+Una característica fundamental de esta arquitectura es la ausencia de repositorios (repos), reemplazándolos directamente con el ORM de Django como capa de 
+acceso a datos dentro de la infraestructura.
+
 ## Servicios
 
 ### Servicio de Productos — Misael Palomino
