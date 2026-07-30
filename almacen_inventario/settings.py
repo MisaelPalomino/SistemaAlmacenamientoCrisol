@@ -109,3 +109,27 @@ REST_FRAMEWORK = {
         'rest_framework.parsers.JSONParser',
     ],
 }
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'rabbitmq': {
+            'format': '{asctime} {levelname} {name}: {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'rabbitmq_console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'rabbitmq',
+        },
+    },
+    'loggers': {
+        'infraestructura.rabbitmq.inventario_consumer': {
+            'handlers': ['rabbitmq_console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+    },
+}

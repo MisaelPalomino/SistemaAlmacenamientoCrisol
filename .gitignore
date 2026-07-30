@@ -178,3 +178,6 @@ __pycache__/
 *.pyo
 *.pyd
 .Python
+
+# Conector temporal generado para Bonita Studio
+.tmp_bonita_connector/
