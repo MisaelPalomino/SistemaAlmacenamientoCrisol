@@ -2,6 +2,29 @@
 
 Proyecto Django con arquitectura en capas (DDD) para la gestión de inventario de Librerías Crisol.
 
+## Estado de la rama
+
+Este documento corresponde a la rama acumulativa
+`feature/openapi-swagger`. La rama parte del trabajo realizado en
+`feature/rabbitmq-gestion-inventario`, por lo que contiene ambos avances:
+
+| Avance | Estado | Evidencia principal |
+|--------|--------|---------------------|
+| Consumidor RabbitMQ de inventario | Completado | `infraestructura/rabbitmq/inventario_consumer.py` |
+| Comando de administración de Django | Completado | `python manage.py consumir_inventario` |
+| Configuración mediante variables de entorno | Completado | `.env.example` y `settings.RABBITMQ` |
+| Confirmación manual y rechazo de mensajes | Completado | `ack` para mensajes válidos y `nack` sin reencolado para mensajes inválidos |
+| Pruebas del consumidor | Completado | 5 casos en `tests/test_inventario_consumer.py` |
+| Esquema OpenAPI 3 | Completado | `/api/schema/` |
+| Swagger UI y ReDoc | Completado | `/api/docs/` y `/api/redoc/` |
+| Pruebas de documentación API | Completado | 3 casos en `tests/test_openapi.py` |
+| Integración con Bonita | Validada de extremo a extremo | Publicación, procesamiento y respuesta correlacionada mediante RabbitMQ |
+
+La implementación BPM, los conectores de Bonita y la Living Application se
+encuentran en el repositorio
+[`MisaelPalomino/CrisolBonitaSoft`](https://github.com/MisaelPalomino/CrisolBonitaSoft),
+rama `feature/rabbitmq-inventario`.
+
 ## Arquitectura
 
 | Capa             | App               | Propósito                         |
@@ -156,16 +179,28 @@ Registra, asigna, clasifica y da seguimiento a incidencias de inventario.
 El servicio de inventario funciona como consumidor de eventos para consultar productos con stock bajo. El flujo implementado es:
 
 ```text
-Proceso BPM u otro productor
+Bonita: Monitorear nivel de stock
+        │  publica JSON + correlation_id
+        ▼
+RabbitMQ: crisol.inventario.request
         │
         ▼
-crisol.inventario.request
+Django: inventario_consumer
+        │
+        ├── ProductoService.generar_alerta_stock_bajo()
+        │
+        ├── ack de la solicitud válida
         │
         ▼
-ProductoService.generar_alerta_stock_bajo()
+RabbitMQ: crisol.inventario.response
+        │  conserva correlation_id
+        ▼
+Bonita: recibe la respuesta y actualiza stockBajo
         │
         ▼
-crisol.inventario.response
+Compuerta ¿Stock bajo?
+        ├── No → Fin sin reposición
+        └── Sí → Generar solicitud de reposición y notificar por correo
 ```
 
 ### Contrato de solicitud
@@ -194,6 +229,34 @@ Cola: `crisol.inventario.response`
 ```
 
 Las colas son durables, las respuestas son persistentes y el consumidor utiliza confirmación manual mediante `ack`. Los mensajes JSON inválidos o con un tipo desconocido se rechazan mediante `nack` sin reencolarlos.
+
+### Correlación de mensajes
+
+Bonita genera un `correlation_id` para cada consulta. Django copia ese mismo
+valor en la respuesta, permitiendo que el conector receptor de Bonita consuma
+únicamente la respuesta correspondiente al caso en ejecución.
+
+### Orden de ejecución para la demostración
+
+1. Iniciar RabbitMQ y comprobar que el puerto AMQP `5672` esté disponible.
+2. Iniciar el consumidor de Django:
+
+   ```powershell
+   python manage.py consumir_inventario
+   ```
+
+3. En otra terminal, iniciar la API y su documentación:
+
+   ```powershell
+   python manage.py runserver
+   ```
+
+4. Iniciar Bonita Studio y ejecutar `Proceso_Gestion_Inventario`.
+5. Completar las tareas humanas hasta llegar a `Monitorear nivel de stock`.
+6. Verificar en la terminal del consumidor el mensaje
+   `Consulta de stock bajo procesada` junto con su `correlation_id`.
+7. Comprobar que el proceso toma la salida correcta de la compuerta
+   `¿Stock bajo?`.
 
 ## Estructura del Proyecto
 
