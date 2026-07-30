@@ -607,3 +607,6 @@ curl -X POST http://localhost:8000/api/recepciones/1/rechazar/ \
     "observaciones": "Producto en mal estado"
   }'
 ```
+A continuación se muestra el reporte generado por SonarQube:
+
+![Reporte de SonarQube](Sonar_Report.jpeg)
