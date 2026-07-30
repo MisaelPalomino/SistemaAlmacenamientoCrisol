@@ -48,6 +48,117 @@ disponible en:
 Swagger UI y ReDoc utilizan recursos locales, por lo que no requieren conexión
 a una CDN durante la demostración.
 
+### Visión de la Arquitectura
+
+El Sistema de Almacenamiento Crisol está diseñado con una arquitectura en capas basada en DDD (Domain-Driven Design), implementada sobre Django REST Framework. 
+Esta arquitectura refleja los procesos de negocio documentados en el análisis BPMN de Librerías Crisol S.A.C., abarcando la Gestión de Abastecimiento, Gestión de 
+Inventario, Ventas en Tienda, Atención al Cliente, Marketing y Promoción, y Gestión de Pedidos Online.
+
+Una característica fundamental de esta arquitectura es la ausencia de repositorios (repos), reemplazándolos directamente con el ORM de Django como capa de acceso 
+a datos dentro de la infraestructura.
+
+### Mapeo de Capas DDD con Procesos de Negocio Crisol
+
+| Capa DDD	         | App/Componente	               | Propósito	                                       | Procesos Crisol Soportados                                           |
+|--------------------|--------------------------------|--------------------------------------------------|----------------------------------------------------------------------|
+| Dominio	         | dominio/models/	               | Entidades, Value Objects, Agregados	            | Abastecimiento, Inventario, Ventas, Atención, Marketing, E-commerce  |
+| Aplicación	      | aplicacion/services/	         | Casos de uso, lógica orquestadora	               | Orquestación de procesos BPMN                                        |
+| Presentación	      | presentacion/	               | API REST, DTOs (Serializers)	                  | Interfaces para tienda física, web y móvil                           | 
+| Infraestructura	   | Django ORM + Integraciones	   | Persistencia, APIs externas, notificaciones	   | SUNAT, pasarelas de pago, couriers, CRM                              | 
+
+### Principios Arquitectónicos
+
+No Uso de Repositorios (Repository Pattern)
+Decisión estratégica: En lugar de implementar un patrón repositorio, utilizamos directamente el ORM de Django como la capa de infraestructura para todas las operaciones 
+de persistencia.
+
+#### ¿Por qué?
+
+- El ORM de Django ya proporciona una abstracción suficientemente robusta y expresiva
+- La capa de infraestructura es transparente al dominio
+- Los servicios de aplicación pueden acceder directamente a Model.objects.*
+- Django ORM incluye características avanzadas (lazy loading, transacciones, migraciones)
+- Alineado con el análisis BPMN: Las entidades definidas en los modelos de datos de Bonita se mapean directamente a modelos Django
+
+#### Beneficios en el contexto Crisol:
+
+- Menor código boilerplate y menos archivos
+- Mayor simplicidad en el mantenimiento
+- Aprovechamiento completo de las características nativas de Django
+- Curva de aprendizaje más baja para nuevos desarrolladores
+- Se mantiene la separación de capas sin añadir complejidad artificial
+- Las reglas de negocio (stock mínimo, validaciones de ISBN, políticas de cambio) se implementan directamente en los modelos
+
+#### Caso concreto: Proceso de Venta en Tienda
+
+1. Cliente solicita libro (presentacion/views/venta_views.py)
+2. Asesor consulta stock vía API (presentacion/serializers/)
+3. Servicio valida disponibilidad (aplicacion/services/venta_service.py)
+4. ORM consulta Producto.objects.filter(isbn=...)
+5. Si hay stock, procesa pago (infraestructura/integraciones/pasarela_pago.py)
+6. ORM actualiza stock: Producto.objects.filter(id=...).update(stock=F('stock')-1)
+7. Servicio genera factura (infraestructura/integraciones/sunat.py)
+8. Notifica al cliente (infraestructura/integraciones/notificaciones.py)
+
+#### Mapeo de Procesos BPMN a Componentes Django
+
+| Proceso Crisol	   | Entidad BPMN	              | Modelo Django          | Servicio Aplicación	 | Integración                 | 
+|--------------------|----------------------------|------------------------|------------------------|-----------------------------|
+| Abastecimiento	   | OrdenCompra, Proveedor     | OrdenCompra, Proveedor | AbastecimientoService	 | Email, ERP                  | 
+| Gestión Inventario |	Producto, EntradaProducto | Producto, Recepcion	   | InventarioService	    | -                           |
+| Ventas Tienda      |	VentaTienda	              | Venta, Cliente	      | VentaService	          | SUNAT, Pasarela Pago        |
+| Atención Cliente   |	Ticket, Cliente	        | Atencion, Ticket	      | AtencionService	       | CRM, Notificaciones         |
+| Marketing	         | Campaña, Promoción	        | Campaña, Promocion	   | MarketingService	    | Email Marketing, Analytics  |
+| Pedidos Online	   | Pedido, Envio, Pago	     | Pedido, Envio, Pago	   | PedidoService	       | Courier, Pasarela Pago      |
+
+#### Ventajas en el Contexto DDD para Crisol
+
+| Aspecto DDD	            | Implementación en Crisol	                           | Proceso de Negocio Asociado          |
+|--------------------------|-----------------------------------------------------|--------------------------------------| 
+| Entidades	               | Modelos Django con métodos de dominio	            | Producto, Proveedor, Cliente, Pedido |
+| Value Objects	         | Campos con lógica de validación (ISBN, DNI, Email)	| Validación de RUC, DNI, emails       | 
+| Agregados	               | Relaciones entre modelos gestionadas por ORM	      | Pedido → DetallePedido → Producto    | 
+| Servicios de Dominio	   | Métodos en modelos para reglas específicas	         | Producto.validar_stock_minimo()      | 
+| Servicios de Aplicación	| Orquestan casos de uso con transaction.atomic()	   | Procesar venta, registrar recepción  | 
+| Repositorios	            | Reemplazados por QuerySets de Django	               | Todas las consultas BPMN             | 
+| Eventos de Dominio	      | Signals de Django (stock bajo, pedido creado)	      | Alertas automáticas de reposición    | 
+
+#### Gestión de Transacciones y Consistencia
+
+Los procesos de negocio de Crisol requieren consistencia transaccional, especialmente en:
+
+- Compra online: Validar stock → Cobrar → Actualizar inventario → Generar guía
+- Venta en tienda: Verificar stock → Cobrar → Actualizar inventario → Facturar
+- Recepción: Registrar ingreso → Actualizar stock → Conciliar con orden de compra
+
+Django ORM maneja esto de forma nativa:
+
+```bash
+from django.db import transaction
+
+@transaction.atomic
+def procesar_pedido_completo(datos_pedido):
+    # Todas las operaciones son atómicas
+    pedido = Pedido.objects.create(...)
+    for item in datos_pedido['items']:
+        Producto.objects.filter(id=item.id).update(
+            stock=F('stock') - item.cantidad
+        )
+        DetallePedido.objects.create(pedido=pedido, ...)
+    Pago.objects.create(pedido=pedido, ...)
+    # Si algo falla, todo se revierte
+```
+
+#### Escalabilidad y Rendimiento
+
+A pesar de no usar repositorios, el sistema es escalable gracias a:
+
+- QuerySets optimizados: select_related(), prefetch_related(), only(), defer()
+- Transacciones explícitas: Control fino con transaction.atomic()
+- Caché: Django Cache Framework para consultas frecuentes
+- Índices: Definidos en modelos para consultas rápidas (ISBN, DNI, fechas)
+- Lecturas replicadas: Configuración de múltiples bases de datos
+
 ## Servicios
 
 ### Servicio de Productos — Misael Palomino
@@ -257,6 +368,48 @@ valor en la respuesta, permitiendo que el conector receptor de Bonita consuma
    `Consulta de stock bajo procesada` junto con su `correlation_id`.
 7. Comprobar que el proceso toma la salida correcta de la compuerta
    `¿Stock bajo?`.
+
+### Servicio de Gestión de Pedidos Online (E-commerce) - Gonzalo R. Zapana 
+
+El servicio de Gestión de Pedidos Online gestiona todo el ciclo de vida de las compras realizadas a través de la tienda virtual de Librerías Crisol S.A.C. 
+Permite a los clientes seleccionar productos, realizar pagos electrónicos, y hacer seguimiento de sus pedidos desde la confirmación hasta la entrega final. 
+El servicio integra pasarelas de pago (Izipay, Yape, Plin), couriers (Olva, Shalom, Serpost) y facturación electrónica con SUNAT, garantizando la consistencia 
+del inventario en tiempo real mediante transacciones atónicas.
+
+#### Endpoints
+
+| Método | 	Endpoint	                 | Descripción                                             |
+|--------|-------------------------------|---------------------------------------------------------| 
+| POST	 | /api/pedidos/	             | Crear un nuevo pedido desde la tienda virtual           | 
+| GET	 | /api/pedidos/{id}/	         | Obtener detalles de un pedido específico                | 
+| GET	 | /api/pedidos/	             | Listar todos los pedidos del cliente autenticado        | 
+| PUT	 | /api/pedidos/{id}/cancelar/	 | Cancelar un pedido (solo si está en estado "PENDIENTE") | 
+| POST	 | /api/pedidos/{id}/pago/	     | Procesar el pago de un pedido                           | 
+| GET	 | /api/pedidos/{id}/tracking/	 | Obtener estado de seguimiento del envío                 | 
+| POST	 | /api/pedidos/{id}/devolucion/ | Solicitar devolución de un pedido entregado             | 
+
+#### Filtros (GET /api/pedidos/)
+
+| Parámetro	    | Tipo	  | Descripción	                      | Ejemplo                  | 
+|---------------|---------|-----------------------------------|--------------------------| 
+| estado	    | String  | Filtrar por estado del pedido	  | ?estado=PAGADO           | 
+| fecha_inicio  | Date	  | Filtrar pedidos desde una fecha	  | ?fecha_inicio=2026-07-01 | 
+| fecha_fin	    | Date	  | Filtrar pedidos hasta una fecha	  | ?fecha_fin=2026-07-31    | 
+| cliente_dni	| String  | Filtrar por DNI del cliente	      | ?cliente_dni=12345678    | 
+| metodo_pago	| String  | Filtrar por método de pago	      | ?metodo_pago=YAPE        | 
+
+#### Ejemplos de consulta 
+
+```bash
+# Listar pedidos pendientes
+GET /api/pedidos/?estado=PENDIENTE
+
+# Listar pedidos de un cliente específico
+GET /api/pedidos/?cliente_dni=12345678
+
+# Listar pedidos pagados con Yape en julio 2026
+GET /api/pedidos/?metodo_pago=YAPE&fecha_inicio=2026-07-01&fecha_fin=2026-07-31
+```
 
 ## Estructura del Proyecto
 
