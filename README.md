@@ -1,5 +1,14 @@
 # Sistema de Almacenamiento - Librerías Crisol
 
+## Equipo
+
+- Jose Javier Alva Cornejo
+- Sebastian Felipe Himan Burgos
+- Arthur Patrick Meza Pareja
+- Misael Jesús Palomino Rivadeneyra
+- Diego Benjamin Rivera Cruz
+- Gonzalo Rodrigo Zapana Pariapaza
+
 Proyecto Django con arquitectura en capas (DDD) para la gestión de inventario de Librerías Crisol.
 
 ## Estado de la rama
